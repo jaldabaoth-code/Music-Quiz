@@ -12,49 +12,23 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class IndexController extends AbstractController
 {
-    public $compteur = 0;
-
     /**
      * @Route("/", name="index")
      */
-    public function index(Request $request, Music $music, SessionInterface $session): Response
+    public function index(Music $music): Response
     {
-
-        $form = $this->createForm(QuizType::class);
-        $form->handleRequest($request);
-
-        $name1 = "";
-        $artist = null;
-        $pictures = null;
-        $tracks = null;
-        $albums = null;
-
-
-        $artistById1 = $music->getArtistById(rand(1, 4000));
-        $artistById2 = $music->getArtistById(rand(1, 4000));
-        $artistById3 = $music->getArtistById(rand(1, 4000));
-
-        $name1 = $artistById1["name"];
-        $name2 = str_replace(" ", "%20", $name1);
-
-        $artist = "";
-        $artists = $music->getArtist($name2, $name1);
-        if (isset($artists[0])) {
-            $artist = $artists[0];
-        } else {
-            $artist = $artists;
-        }
-        $albums = $music->getAlbums($artist['id']);
-        $pictures = $music->getPicture($artist['id']);
-        $tracks = $music->getTracks($artist['id']);
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            dd($_POST);
-        }
+        // Generate a random id
+        $artistById1 = $music->getMusicData(rand(1, 9), '');
+        $artistById2 = $music->getMusicData(rand(1, 4000), '');
+        $artistById3 = $music->getMusicData(rand(1, 4000), '');
+        $artists = $music->getArtist($artistById1["name"]);
+        $artist = isset($artists[0]) ? $artist = $artists[0] : $artist = $artists;
+        $tracks = $music->getMusicData($artist['id'], '/tracks');
+        /* We don't use them because, we didn't finished the Hackathon */
+        // $albums = $music->getMusicData($artist['id'], '/albums');
+        // $pictures = $music->getMusicData($artist['id'], '/pictures');
         return $this->render('index.html.twig', [
-            'pictures' => $pictures,
-            'albums' => $albums,
-            'tracks' => $tracks,
+            'tracks' => $tracks['data']['item'],
             'artists' => [$artist, $artistById1, $artistById2, $artistById3]
         ]);
     }

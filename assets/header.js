@@ -10,6 +10,5 @@ const flickerAndColorText = text =>
     .join('');
 const neonGlory = target => target.innerHTML = flickerAndColorText(target.textContent);
 
-
 neonGlory(target);
 target.onclick = ({ target }) =>  neonGlory(target);
